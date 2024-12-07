@@ -1,13 +1,17 @@
 use std::ops::{Index, IndexMut};
 
-const PERM_TABLE_SIZE: usize = 0x100;
+pub const PERM_TABLE_SIZE: usize = 512;
+
+pub trait Hasher {
+  fn hash(&self, to_hash: &[usize]) -> usize;
+}
 
 /// A fixed size, shuffled array of integers. 
 /// Ensures input coordinates always map to the same
 /// gradients.
 /// Efficiently precomputes gradients
 pub struct PermutationTable {
-  values: [u8; PERM_TABLE_SIZE * 2]
+  values: [u8; PERM_TABLE_SIZE]
 }
 
 impl Index<usize> for PermutationTable {
@@ -50,6 +54,18 @@ impl PermutationTable {
       Self {
         values
       }
+  }
+}
+
+impl Hasher for PermutationTable {
+  fn hash(&self, to_hash: &[usize]) -> usize {
+      let idx = to_hash
+        .iter()
+        .map(|&v| (v & 0xff) as usize)
+        .reduce(|acc, v| self.values[acc] as usize ^ v)
+        .unwrap();
+
+      self.values[idx] as usize
   }
 }
 
