@@ -1,7 +1,5 @@
 use rand::{
   Rng,
-  rngs::StdRng,
-  SeedableRng
 };
 
 use image::{ImageBuffer, Rgb};
